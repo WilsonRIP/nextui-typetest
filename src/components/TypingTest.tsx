@@ -25,6 +25,7 @@ export default function TypingTest({
   const [isTestComplete, setIsTestComplete] = useState(false);
   const [errors, setErrors] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const textDisplayRef = useRef<HTMLDivElement>(null);
 
   // Start the test when user begins typing
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,10 +69,24 @@ export default function TypingTest({
         const elapsedTimeInMinutes = (Date.now() - startTime) / 60000;
         const wordsTyped = value.length / 5;
         const currentWpm = Math.round(wordsTyped / elapsedTimeInMinutes);
-        setWpm(currentWpm);
+        setWpm(currentWpm || 0); // Prevent NaN
       }
     }
   };
+
+  // Scroll the text display to keep the current character in view
+  useEffect(() => {
+    if (textDisplayRef.current && currentIndex > 0) {
+      const characters = textDisplayRef.current.children;
+      if (characters[currentIndex]) {
+        characters[currentIndex].scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+          inline: "center",
+        });
+      }
+    }
+  }, [currentIndex]);
 
   // Timer for the test
   useEffect(() => {
@@ -120,21 +135,44 @@ export default function TypingTest({
     if (inputRef.current) inputRef.current.focus();
   };
 
-  // Highlight text based on typing progress
+  // Format time as MM:SS
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
+  };
+
+  // Render text with proper spacing for code
   const renderText = () => {
     return textToType.split("").map((char, index) => {
-      let color = "text-gray-400"; // Default color for text not yet reached
+      let className = "character character-ahead";
 
       if (index < inputValue.length) {
-        color = inputValue[index] === char ? "text-green-500" : "text-red-500";
+        className =
+          inputValue[index] === char
+            ? "character character-correct"
+            : "character character-incorrect";
       }
 
       if (index === currentIndex) {
-        color += " bg-gray-200";
+        className += " character-current";
+      }
+
+      // Handle whitespace characters
+      if (char === " ") {
+        return (
+          <span key={index} className={className}>
+            &nbsp;
+          </span>
+        );
+      }
+
+      if (char === "\n") {
+        return <br key={index} />;
       }
 
       return (
-        <span key={index} className={color}>
+        <span key={index} className={className}>
           {char}
         </span>
       );
@@ -142,50 +180,79 @@ export default function TypingTest({
   };
 
   return (
-    <Card className="max-w-4xl mx-auto">
-      <CardHeader className="flex justify-between items-center">
+    <Card className="w-full shadow-md border border-gray-100">
+      <CardHeader className="flex justify-between items-center bg-blue-600 text-white">
         <h2 className="text-xl font-bold">Typing Test</h2>
         <div className="flex gap-2">
-          <Chip color="primary">{timeLeft}s</Chip>
-          <Chip color="success">{wpm} WPM</Chip>
+          <Chip
+            color="primary"
+            variant="flat"
+            className="font-mono font-medium bg-white text-blue-600"
+          >
+            {formatTime(timeLeft)}
+          </Chip>
+          <Chip
+            color="success"
+            variant="flat"
+            className="font-mono font-medium bg-white text-green-600"
+          >
+            {wpm} WPM
+          </Chip>
           <Chip
             color={
               accuracy > 90 ? "success" : accuracy > 70 ? "warning" : "danger"
             }
+            variant="flat"
+            className="font-mono font-medium bg-white"
           >
-            {accuracy}% Accuracy
+            {accuracy}%
           </Chip>
         </div>
       </CardHeader>
 
-      <CardBody>
-        <div className="mb-4 p-4 bg-gray-50 rounded-lg text-lg font-mono leading-relaxed">
+      <CardBody className="p-4">
+        <div
+          className="p-6 rounded-lg bg-gray-50 font-mono text-lg mb-6 h-60 overflow-auto whitespace-pre shadow-inner"
+          ref={textDisplayRef}
+          style={{ lineHeight: "1.75", letterSpacing: "0.5px" }}
+        >
           {renderText()}
         </div>
 
         <Progress
           value={(currentIndex / textToType.length) * 100}
           color="primary"
-          className="mb-4"
-          showValueLabel
+          className="mb-4 h-2"
+          aria-label="Typing progress"
         />
 
-        <input
-          ref={inputRef}
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-          placeholder="Start typing here..."
-          disabled={isTestComplete}
-          autoFocus
-        />
+        <div className="flex items-center gap-4">
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputValue}
+            onChange={handleInputChange}
+            className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+            placeholder="Type to start the test..."
+            disabled={isTestComplete}
+            autoFocus
+            aria-label="Typing input field"
+          />
+          <Button color="primary" onPress={resetTest} size="md">
+            Reset
+          </Button>
+        </div>
       </CardBody>
 
-      <CardFooter>
-        <Button color="primary" onClick={resetTest} className="ml-auto">
-          {isTestComplete ? "Try Again" : "Reset"}
-        </Button>
+      <CardFooter className="flex justify-between items-center border-t bg-gray-50 p-3">
+        <div className="text-sm text-gray-500">
+          {isTestActive
+            ? `${currentIndex}/${textToType.length} characters`
+            : "Type to start the test"}
+        </div>
+        <div className="text-sm">
+          <span className="text-gray-500">0%</span>
+        </div>
       </CardFooter>
     </Card>
   );

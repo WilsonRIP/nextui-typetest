@@ -29,47 +29,57 @@ export default function TestResults({
   else if (accuracy > 85) accuracyRating = "Average";
 
   return (
-    <Card className="max-w-md mx-auto">
-      <CardHeader className="flex justify-center">
+    <Card className="w-full shadow-sm mb-8">
+      <CardHeader className="bg-green-600 text-white flex justify-center">
         <h2 className="text-xl font-bold">Your Results</h2>
       </CardHeader>
       <Divider />
-      <CardBody>
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-600">Typing Speed:</span>
-            <div className="text-right">
-              <span className="text-2xl font-bold">{wpm}</span>
-              <span className="ml-1 text-gray-500">WPM</span>
-              <div className="text-sm text-gray-500">{speedRating}</div>
+      <CardBody className="px-6 py-8">
+        <div className="grid grid-cols-2 gap-6">
+          <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 text-center">
+            <h3 className="text-sm uppercase tracking-wide text-gray-500 mb-1">
+              Typing Speed
+            </h3>
+            <div className="text-4xl font-bold text-gray-800 mb-1">{wpm}</div>
+            <div className="text-sm text-gray-500">WPM ({speedRating})</div>
+          </div>
+
+          <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 text-center">
+            <h3 className="text-sm uppercase tracking-wide text-gray-500 mb-1">
+              Accuracy
+            </h3>
+            <div className="text-4xl font-bold text-gray-800 mb-1">
+              {accuracy}%
             </div>
+            <div className="text-sm text-gray-500">{accuracyRating}</div>
           </div>
 
-          <div className="flex justify-between items-center">
-            <span className="text-gray-600">Accuracy:</span>
-            <div className="text-right">
-              <span className="text-2xl font-bold">{accuracy}</span>
-              <span className="ml-1 text-gray-500">%</span>
-              <div className="text-sm text-gray-500">{accuracyRating}</div>
+          <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 text-center">
+            <h3 className="text-sm uppercase tracking-wide text-gray-500 mb-1">
+              Errors
+            </h3>
+            <div className="text-4xl font-bold text-gray-800 mb-1">
+              {errors}
             </div>
+            <div className="text-sm text-gray-500">Total mistakes</div>
           </div>
 
-          <div className="flex justify-between items-center">
-            <span className="text-gray-600">Errors:</span>
-            <span className="text-2xl font-bold">{errors}</span>
+          <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 text-center">
+            <h3 className="text-sm uppercase tracking-wide text-gray-500 mb-1">
+              Duration
+            </h3>
+            <div className="text-4xl font-bold text-gray-800 mb-1">
+              {duration}
+            </div>
+            <div className="text-sm text-gray-500">seconds</div>
           </div>
+        </div>
 
-          <div className="flex justify-between items-center">
-            <span className="text-gray-600">Time:</span>
-            <span className="text-2xl font-bold">{duration} seconds</span>
-          </div>
+        <Divider className="my-6" />
 
-          <Divider className="my-4" />
-
-          <div className="text-center text-sm text-gray-500">
-            The average typing speed is 40 WPM, with professional typists typing
-            at 65-75 WPM.
-          </div>
+        <div className="text-center text-gray-600 text-sm">
+          The average typing speed is 40 WPM, with professional typists typing
+          at 65-75 WPM.
         </div>
       </CardBody>
     </Card>

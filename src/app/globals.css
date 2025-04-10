@@ -1,26 +1,77 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --primary-color: #3498db;
+  --primary-dark: #2980b9;
+  --secondary-color: #2ecc71;
+  --error-color: #e74c3c;
+  --background-light: #f8fafc;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --card-background: #ffffff;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-slate-50 text-gray-800;
+  font-family: var(--font-geist-sans);
+}
+
+.type-container {
+  @apply p-6 rounded-lg bg-white shadow-sm font-mono text-lg leading-relaxed;
+  min-height: 180px;
+}
+
+.character {
+  @apply transition-colors duration-100;
+  font-family: "Courier New", Consolas, monospace;
+  letter-spacing: 0;
+  display: inline-block;
+  line-height: 1.75;
+  padding: 0 1px;
+}
+
+.character-current {
+  @apply bg-blue-100 rounded;
+  position: relative;
+}
+
+.character-current::after {
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 2px;
+  background-color: #3b82f6;
+  left: 100%;
+  top: 0;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.character-correct {
+  @apply text-green-600;
+}
+
+.character-incorrect {
+  @apply text-red-600;
+}
+
+.character-ahead {
+  @apply text-gray-400;
+}
+
+.test-input {
+  @apply w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-lg;
+}
+
+.settings-card {
+  @apply bg-white rounded-lg shadow-sm overflow-hidden mb-6;
 }
